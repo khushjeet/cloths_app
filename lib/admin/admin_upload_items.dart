@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clothes_app/users/authentication/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -125,6 +126,11 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Get.to(() => const LoginScreen());
+                  },
+                  child: const Text("Go To Login")),
               const Icon(
                 Icons.add_photo_alternate,
                 color: Colors.white54,
@@ -161,13 +167,13 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
       ),
     );
   }
-uploadItemImage() async {
+
+  uploadItemImage() async {
     List<String> tagsList = tagsController.text.split(',');
     List<String> sizesList = sizesController.text.split(',');
     List<String> colorsList = colorsController.text.split(',');
 
     try {
-      
       var requestImgurApi = http.MultipartRequest(
           "POST",
           Uri.parse(
@@ -184,12 +190,20 @@ uploadItemImage() async {
 
       requestImgurApi.fields.addAll(
         {
+          // 'name': nameController.text.trim().toString(),
+          // 'rating': ratingController.text.trim().toString(),
+          // 'tags': tagsList.join(','), // Join list items without brackets
+          // 'price': priceController.text.trim().toString(),
+          // 'sizes': sizesList.join(','), // Join list items without brackets
+          // 'colors': colorsList.join(','), // Join list items without brackets
+          // 'description': descriptionController.text.trim().toString(),
+          // 'image': imageLink.toString(),
           'name': nameController.text.trim().toString(),
           'rating': ratingController.text.trim().toString(),
-          'tags': tagsList.join(','), // Join list items without brackets
+          'tags': tagsList.toString(), // Join list items without brackets
           'price': priceController.text.trim().toString(),
-          'sizes': sizesList.join(','), // Join list items without brackets
-          'colors': colorsList.join(','), // Join list items without brackets
+          'sizes': sizesList.toString(), // Join list items without brackets
+          'colors': colorsList.toString(), // Join list items without brackets
           'description': descriptionController.text.trim().toString(),
           'image': imageLink.toString(),
         },
@@ -213,7 +227,6 @@ uploadItemImage() async {
     }
   }
 
-  
   Widget uploadItemFormScreen() {
     return Scaffold(
       backgroundColor: Colors.black,

@@ -1,9 +1,11 @@
-class API
-{
+
+class API {
   static const hostConnect = "http://192.168.95.165/api_clothes_store";
+  //  static const hostConnect = "http://192.168.43.26/api_clothes_store";
   static const hostConnectUser = "$hostConnect/user";
   static const hostConnectAdmin = "$hostConnect/admin";
   static const hostUploadItem = "$hostConnect/items";
+  static const hostClothes = "$hostConnect/clothes";
 
   //signUp-Login user
   static const validateEmail = "$hostConnectUser/validate_email.php";
@@ -15,4 +17,8 @@ class API
 
   //upload-save new item
   static const uploadNewItem = "$hostUploadItem/upload.php";
+
+  //Clothes
+  static const getTrendingMostPopularClothes = "$hostClothes/trending.php";
+  static const getAllClothes = "$hostClothes/all.php";
 }
