@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:clothes_app/admin/admin_login.dart';
 import 'package:clothes_app/api_connection/api_connection.dart';
 import 'package:clothes_app/users/authentication/signup_screen.dart';
@@ -10,21 +11,29 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+class LoginScreen extends StatefulWidget
+{
+
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+
+
+class _LoginScreenState extends State<LoginScreen>
+{
   var formKey = GlobalKey<FormState>();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var isObsecure = true.obs;
 
-  loginUserNow() async {
-    try {
+
+  loginUserNow() async
+  {
+    try
+    {
       var res = await http.post(
         Uri.parse(API.login),
         body: {
@@ -33,11 +42,11 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
-      if (res.statusCode ==
-          200) //from flutter app the connection with api to server - success
+      if(res.statusCode == 200) //from flutter app the connection with api to server - success
       {
         var resBodyOfLogin = jsonDecode(res.body);
-        if (resBodyOfLogin['success'] == true) {
+        if(resBodyOfLogin['success'] == true)
+        {
           Fluttertoast.showToast(msg: "you are logged-in Successfully.");
 
           User userInfo = User.fromJson(resBodyOfLogin["userData"]);
@@ -45,28 +54,35 @@ class _LoginScreenState extends State<LoginScreen> {
           //save userInfo to local Storage using Shared Prefrences
           await RememberUserPrefs.storeUserInfo(userInfo);
 
-          Future.delayed(const Duration(milliseconds: 2000), () {
+          Future.delayed(Duration(milliseconds: 2000), ()
+          {
             Get.to(DashboardOfFragments());
           });
-        } else {
-          Fluttertoast.showToast(
-              msg:
-                  "Incorrect Credentials.\nPlease write correct password or email and Try Again.");
+        }
+        else
+        {
+          Fluttertoast.showToast(msg: "Incorrect Credentials.\nPlease write correct password or email and Try Again.");
         }
       }
-    } catch (errorMsg) {
-      AlertDialog(
-        title: Text(errorMsg.toString()),
-      );
+      else
+      {
+        Fluttertoast.showToast(msg: "Status is not 200");
+      }
+    }
+    catch(errorMsg)
+    {
+      print("Error :: " + errorMsg.toString());
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutBuilder(
-        builder: (context, cons) {
+        builder: (context, cons)
+        {
           return ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: cons.maxHeight,
@@ -74,13 +90,15 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+
                   //login screen header
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 285,
-                    // child: Image.asset(
-                    //   "images/login.jpg",
-                    // ),
+                    child: Image.asset(
+                      "assets/images/images.png",
+                      
+                    ),
                   ),
 
                   //login screen sign-in form
@@ -104,16 +122,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.fromLTRB(30, 30, 30, 8),
                         child: Column(
                           children: [
+
                             //email-password-login button
                             Form(
                               key: formKey,
                               child: Column(
                                 children: [
+
                                   //email
                                   TextFormField(
                                     controller: emailController,
-                                    validator: (val) =>
-                                        val == "" ? "Please write email" : null,
+                                    validator: (val) => val == "" ? "Please write email" : null,
                                     decoration: InputDecoration(
                                       prefixIcon: const Icon(
                                         Icons.email,
@@ -144,8 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           color: Colors.white60,
                                         ),
                                       ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
+                                      contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
@@ -154,88 +172,77 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
 
-                                  const SizedBox(
-                                    height: 18,
-                                  ),
+                                  const SizedBox(height: 18,),
 
                                   //password
                                   Obx(
-                                    () => TextFormField(
-                                      controller: passwordController,
-                                      obscureText: isObsecure.value,
-                                      validator: (val) => val == ""
-                                          ? "Please write password"
-                                          : null,
-                                      decoration: InputDecoration(
-                                        prefixIcon: const Icon(
-                                          Icons.vpn_key_sharp,
-                                          color: Colors.black,
-                                        ),
-                                        suffixIcon: Obx(
-                                          () => GestureDetector(
-                                            onTap: () {
-                                              isObsecure.value =
-                                                  !isObsecure.value;
-                                            },
-                                            child: Icon(
-                                              isObsecure.value
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: Colors.black,
+                                      ()=> TextFormField(
+                                        controller: passwordController,
+                                        obscureText: isObsecure.value,
+                                        validator: (val) => val == "" ? "Please write password" : null,
+                                        decoration: InputDecoration(
+                                          prefixIcon: const Icon(
+                                            Icons.vpn_key_sharp,
+                                            color: Colors.black,
+                                          ),
+                                          suffixIcon: Obx(
+                                                ()=> GestureDetector(
+                                              onTap: ()
+                                              {
+                                                isObsecure.value = !isObsecure.value;
+                                              },
+                                              child: Icon(
+                                                isObsecure.value ? Icons.visibility_off : Icons.visibility,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        hintText: "password...",
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          borderSide: const BorderSide(
-                                            color: Colors.white60,
+                                          hintText: "password...",
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(
+                                              color: Colors.white60,
+                                            ),
                                           ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          borderSide: const BorderSide(
-                                            color: Colors.white60,
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(
+                                              color: Colors.white60,
+                                            ),
                                           ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          borderSide: const BorderSide(
-                                            color: Colors.white60,
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(
+                                              color: Colors.white60,
+                                            ),
                                           ),
-                                        ),
-                                        disabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          borderSide: const BorderSide(
-                                            color: Colors.white60,
+                                          disabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(
+                                              color: Colors.white60,
+                                            ),
                                           ),
+                                          contentPadding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 6,
+                                          ),
+                                          fillColor: Colors.white,
+                                          filled: true,
                                         ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 14,
-                                          vertical: 6,
-                                        ),
-                                        fillColor: Colors.white,
-                                        filled: true,
                                       ),
-                                    ),
                                   ),
 
-                                  const SizedBox(
-                                    height: 18,
-                                  ),
+                                  const SizedBox(height: 18,),
 
                                   //button
                                   Material(
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(30),
                                     child: InkWell(
-                                      onTap: () {
-                                        if (formKey.currentState!.validate()) {
+                                      onTap: ()
+                                      {
+                                        if(formKey.currentState!.validate())
+                                        {
                                           loginUserNow();
                                         }
                                       },
@@ -259,18 +266,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
 
-                            const SizedBox(
-                              height: 16,
-                            ),
+                            SizedBox(height: 16,),
 
                             //dont have an account button - button
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text("Don't have an Account?"),
+                                const Text(
+                                  "Don't have an Account?"
+                                ),
                                 TextButton(
-                                  onPressed: () {
-                                    Get.to(const SignUpScreen());
+                                  onPressed: ()
+                                  {
+                                    Get.to(SignUpScreen());
                                   },
                                   child: const Text(
                                     "SignUp Here",
@@ -295,14 +303,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text("Are you an Admin?"),
+                                const Text(
+                                    "Are you an Admin?"
+                                ),
                                 TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AdminLoginScreen()));
+                                  onPressed: ()
+                                  {
+                                    Get.to(AdminLoginScreen());
                                   },
                                   child: const Text(
                                     "Click Here",
@@ -319,6 +326,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),

@@ -9,8 +9,6 @@ class ProfileFragmentScreen extends StatelessWidget
 {
   final CurrentUser _currentUser = Get.put(CurrentUser());
 
-   ProfileFragmentScreen({super.key});
-
   signOutUser() async
   {
     var resultResponse = await Get.dialog(
@@ -61,7 +59,7 @@ class ProfileFragmentScreen extends StatelessWidget
       RememberUserPrefs.removeUserInfo()
           .then((value)
       {
-        Get.off(const LoginScreen());
+        Get.off(LoginScreen());
       });
     }
   }
@@ -102,7 +100,12 @@ class ProfileFragmentScreen extends StatelessWidget
       padding: const EdgeInsets.all(32),
       children: [
 
-    
+        Center(
+          child: Image.asset(
+              "assets/images/images.png",
+            width: 240,
+          ),
+        ),
 
         const SizedBox(height: 20,),
 

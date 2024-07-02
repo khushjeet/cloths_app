@@ -11,8 +11,6 @@ import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget
 {
-  const SignUpScreen({super.key});
-
 
 
   @override
@@ -53,6 +51,10 @@ class _SignUpScreenState extends State<SignUpScreen>
           //register & save new user record to database
           registerAndSaveUserRecord();
         }
+      }
+      else
+      {
+        Fluttertoast.showToast(msg: "Status is not 200");
       }
     }
     catch(e)
@@ -96,6 +98,10 @@ class _SignUpScreenState extends State<SignUpScreen>
           Fluttertoast.showToast(msg: "Error Occurred, Try Again.");
         }
       }
+      else
+      {
+        Fluttertoast.showToast(msg: "Status is not 200");
+      }
     }
     catch(e)
     {
@@ -124,9 +130,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 285,
-                    // child: Image.asset(
-                    //   "images/register.jpg",
-                    // ),
+                    child: Image.asset(
+                      "assets/images/images.png",
+                    ),
                   ),
 
                   //signup screen sign-up form
@@ -352,7 +358,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 TextButton(
                                   onPressed: ()
                                   {
-                                    Get.to(const LoginScreen());
+                                    Get.to(LoginScreen());
                                   },
                                   child: const Text(
                                     "Login Here",

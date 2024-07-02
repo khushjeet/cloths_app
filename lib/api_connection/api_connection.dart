@@ -1,11 +1,12 @@
-
-class API {
-  static const hostConnect = "http://192.168.95.165/api_clothes_store";
-  //  static const hostConnect = "http://192.168.43.26/api_clothes_store";
+class API
+{
+  static const hostConnect = "http://192.168.174.165/api_clothes_store";
   static const hostConnectUser = "$hostConnect/user";
   static const hostConnectAdmin = "$hostConnect/admin";
-  static const hostUploadItem = "$hostConnect/items";
+  static const hostItem = "$hostConnect/items";
   static const hostClothes = "$hostConnect/clothes";
+  static const hostCart = "$hostConnect/cart";
+  static const hostFavorite = "$hostConnect/favorite";
 
   //signUp-Login user
   static const validateEmail = "$hostConnectUser/validate_email.php";
@@ -15,10 +16,24 @@ class API {
   //login admin
   static const adminLogin = "$hostConnectAdmin/login.php";
 
-  //upload-save new item
-  static const uploadNewItem = "$hostUploadItem/upload.php";
+  //items
+  static const uploadNewItem = "$hostItem/upload.php";
+  static const searchItems = "$hostItem/search.php";
 
   //Clothes
   static const getTrendingMostPopularClothes = "$hostClothes/trending.php";
   static const getAllClothes = "$hostClothes/all.php";
+
+  //cart
+  static const addToCart = "$hostCart/add.php";
+  static const getCartList = "$hostCart/read.php";
+  static const deleteSelectedItemsFromCartList = "$hostCart/delete.php";
+  static const updateItemInCartList = "$hostCart/update.php";
+
+  //favorite
+  static const validateFavorite = "$hostFavorite/validate_favorite.php";
+  static const addFavorite = "$hostFavorite/add.php";
+  static const deleteFavorite = "$hostFavorite/delete.php";
+  static const readFavorite = "$hostFavorite/read.php";
+
 }

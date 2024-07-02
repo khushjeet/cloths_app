@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
-class ItemDetailsController extends GetxController {
+class ItemDetailsController extends GetxController
+{
   RxInt _quantityItem = 1.obs;
   RxInt _sizeItem = 0.obs;
   RxInt _colorItem = 0.obs;
@@ -11,19 +12,23 @@ class ItemDetailsController extends GetxController {
   int get color => _colorItem.value;
   bool get isFavorite => _isFavorite.value;
 
-  setQuantityItem(int quantityOfItem) {
+  setQuantityItem(int quantityOfItem)
+  {
     _quantityItem.value = quantityOfItem;
   }
 
-  setSizeItem(int sizeOfItem) {
+  setSizeItem(int sizeOfItem)
+  {
     _sizeItem.value = sizeOfItem;
   }
 
-  setColorItem(int colorOfItem) {
+  setColorItem(int colorOfItem)
+  {
     _colorItem.value = colorOfItem;
   }
 
-  setIsFavorite(bool isFavorite) {
+  setIsFavorite(bool isFavorite)
+  {
     _isFavorite.value = isFavorite;
   }
 }

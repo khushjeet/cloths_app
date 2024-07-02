@@ -8,16 +8,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 
-// ignore: must_be_immutable
 class DashboardOfFragments extends StatelessWidget
 {
-  final CurrentUser _rememberCurrentUser = Get.put(CurrentUser());
+  CurrentUser _rememberCurrentUser = Get.put(CurrentUser());
 
   final List<Widget> _fragmentScreens =
   [
     HomeFragmentScreen(),
-    const FavoritesFragmentScreen(),
-    const OrderFragmentScreen(),
+    FavoritesFragmentScreen(),
+    OrderFragmentScreen(),
     ProfileFragmentScreen(),
   ];
 
@@ -46,8 +45,6 @@ class DashboardOfFragments extends StatelessWidget
   ];
 
   final RxInt _indexNumber = 0.obs;
-
-  DashboardOfFragments({super.key});
 
   @override
   Widget build(BuildContext context)

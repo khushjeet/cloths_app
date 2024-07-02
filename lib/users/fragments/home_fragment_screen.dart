@@ -1,79 +1,103 @@
 import 'dart:convert';
 import 'package:clothes_app/api_connection/api_connection.dart';
-import 'package:clothes_app/users/fragments/items/item_details_screen.dart';
-import 'package:clothes_app/users/model/clothes';
-
+import 'package:clothes_app/users/cart/cart_list_screen.dart';
+import 'package:clothes_app/users/item/item_details_screen.dart';
+import 'package:clothes_app/users/item/search_items.dart';
+import 'package:clothes_app/users/model/clothes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-class HomeFragmentScreen extends StatelessWidget {
+
+class HomeFragmentScreen extends StatelessWidget
+{
   TextEditingController searchController = TextEditingController();
 
-  Future<List<Clothes>> getTrendingClothItems() async {
+
+  Future<List<Clothes>> getTrendingClothItems() async
+  {
     List<Clothes> trendingClothItemsList = [];
 
-    try {
-      var res = await http.post(Uri.parse(API.getTrendingMostPopularClothes));
+    try
+    {
+      var res = await http.post(
+        Uri.parse(API.getTrendingMostPopularClothes)
+      );
 
-      if (res.statusCode == 200) {
+      if(res.statusCode == 200)
+      {
         var responseBodyOfTrending = jsonDecode(res.body);
-        if (responseBodyOfTrending["success"] == true) {
-          for (var eachRecord in (responseBodyOfTrending["clothItemsData"] as List)) {
+        if(responseBodyOfTrending["success"] == true)
+        {
+          (responseBodyOfTrending["clothItemsData"] as List).forEach((eachRecord)
+          {
             trendingClothItemsList.add(Clothes.fromJson(eachRecord));
-          }
+          });
         }
-      } else {
+      }
+      else
+      {
         Fluttertoast.showToast(msg: "Error, status code is not 200");
       }
-    } catch (errorMsg) {
-      print("Error:: $errorMsg");
+    }
+    catch(errorMsg)
+    {
+      print("Error:: " + errorMsg.toString());
     }
 
     return trendingClothItemsList;
   }
 
-  Future<List<Clothes>> getAllClothItems() async {
+  Future<List<Clothes>> getAllClothItems() async
+  {
     List<Clothes> allClothItemsList = [];
 
-    try {
-      var res = await http.post(Uri.parse(API.getAllClothes));
+    try
+    {
+      var res = await http.post(
+          Uri.parse(API.getAllClothes)
+      );
 
-      if (res.statusCode == 200) {
+      if(res.statusCode == 200)
+      {
         var responseBodyOfAllClothes = jsonDecode(res.body);
-        if (responseBodyOfAllClothes["success"] == true) {
-          for (var eachRecord in (responseBodyOfAllClothes["clothItemsData"] as List)) {
+        if(responseBodyOfAllClothes["success"] == true)
+        {
+          (responseBodyOfAllClothes["clothItemsData"] as List).forEach((eachRecord)
+          {
             allClothItemsList.add(Clothes.fromJson(eachRecord));
-          }
+          });
         }
-      } else {
+      }
+      else
+      {
         Fluttertoast.showToast(msg: "Error, status code is not 200");
       }
-    } catch (errorMsg) {
-      print("Error:: $errorMsg");
+    }
+    catch(errorMsg)
+    {
+      print("Error:: " + errorMsg.toString());
     }
 
     return allClothItemsList;
   }
-var imageUrl = "http://192.168.95.165/api_clothes_store/";
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            height: 16,
-          ),
+
+          const SizedBox(height: 16,),
 
           //search bar widget
           showSearchBarWidget(),
 
-          const SizedBox(
-            height: 24,
-          ),
+          const SizedBox(height: 24,),
 
           //trending-popular items
           const Padding(
@@ -89,9 +113,7 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
           ),
           trendingMostPopularClothItemWidget(context),
 
-          const SizedBox(
-            height: 24,
-          ),
+          const SizedBox(height: 24,),
 
           //all new collections/items
           const Padding(
@@ -107,12 +129,14 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
           ),
 
           allItemWidget(context),
+
         ],
       ),
     );
   }
 
-  Widget showSearchBarWidget() {
+  Widget showSearchBarWidget()
+  {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: TextField(
@@ -120,7 +144,10 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
         controller: searchController,
         decoration: InputDecoration(
           prefixIcon: IconButton(
-            onPressed: () {},
+            onPressed: ()
+            {
+              Get.to(SearchItems(typedKeyWords: searchController.text));
+            },
             icon: const Icon(
               Icons.search,
               color: Colors.purpleAccent,
@@ -132,7 +159,10 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
             fontSize: 12,
           ),
           suffixIcon: IconButton(
-            onPressed: () {},
+            onPressed: ()
+            {
+              Get.to(CartListScreen());
+            },
             icon: const Icon(
               Icons.shopping_cart,
               color: Colors.purpleAccent,
@@ -159,33 +189,40 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
     );
   }
 
-  Widget trendingMostPopularClothItemWidget(context) {
+  Widget trendingMostPopularClothItemWidget(context)
+  {
     return FutureBuilder(
       future: getTrendingClothItems(),
-      builder: (context, AsyncSnapshot<List<Clothes>> dataSnapShot) {
-        if (dataSnapShot.connectionState == ConnectionState.waiting) {
+      builder: (context, AsyncSnapshot<List<Clothes>> dataSnapShot)
+      {
+        if(dataSnapShot.connectionState == ConnectionState.waiting)
+        {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        if (dataSnapShot.data == null) {
+        if(dataSnapShot.data == null)
+        {
           return const Center(
             child: Text(
               "No Trending item found",
             ),
           );
         }
-        if (dataSnapShot.data!.isNotEmpty) {
+        if(dataSnapShot.data!.length > 0)
+        {
           return SizedBox(
             height: 260,
             child: ListView.builder(
               itemCount: dataSnapShot.data!.length,
               scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
+              itemBuilder: (context, index)
+              {
                 Clothes eachClothItemData = dataSnapShot.data![index];
                 return GestureDetector(
-                  onTap: () {
-                    Get.to(()=> ItemDetailsScreen(itemInfo: eachClothItemData,));
+                  onTap: ()
+                  {
+                    Get.to(ItemDetailsScreen(itemInfo: eachClothItemData));
                   },
                   child: Container(
                     width: 200,
@@ -198,9 +235,10 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black,
-                      boxShadow: const [
+                      boxShadow:
+                      const [
                         BoxShadow(
-                          offset: Offset(0, 3),
+                          offset: Offset(0,3),
                           blurRadius: 6,
                           color: Colors.grey,
                         ),
@@ -208,23 +246,25 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                     ),
                     child: Column(
                       children: [
-                      //  item image
+
+                        //item image
                         ClipRRect(
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(22),
                             topRight: Radius.circular(22),
                           ),
                           child: FadeInImage(
-                            height: 140,
+                            height: 150,
                             width: 200,
                             fit: BoxFit.cover,
-                            placeholder:
-                                const AssetImage("assets/images/images.png"),
-                            image: NetworkImage(
-                              "$imageUrl+${eachClothItemData.image!}"
+                            placeholder: const AssetImage(
+                              "assets/images/images.png",
                             ),
-                            imageErrorBuilder:
-                                (context, error, stackTraceError) {
+                            image: NetworkImage(
+                              eachClothItemData.image!,
+                            ),
+                            imageErrorBuilder: (context, error, stackTraceError)
+                            {
                               return const Center(
                                 child: Icon(
                                   Icons.broken_image_outlined,
@@ -241,12 +281,13 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+
                               //item name & price
                               Row(
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      eachClothItemData.name ?? "price is not Mentioned",
+                                      eachClothItemData.name!,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -260,7 +301,7 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                                     width: 10,
                                   ),
                                   Text(
-                                    "${eachClothItemData.price??"price is not Mentioned"}",
+                                    eachClothItemData.price.toString(),
                                     style: const TextStyle(
                                       color: Colors.purpleAccent,
                                       fontSize: 18,
@@ -270,42 +311,44 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                                 ],
                               ),
 
-                              const SizedBox(
-                                height: 8,
-                              ),
+                              const SizedBox(height: 8,),
 
                               //rating stars & rating numbers
                               Row(
                                 children: [
+
                                   RatingBar.builder(
-                                    initialRating: eachClothItemData.rating??4.5,
+                                    initialRating: eachClothItemData.rating!,
                                     minRating: 1,
                                     direction: Axis.horizontal,
                                     allowHalfRating: true,
                                     itemCount: 5,
-                                    itemBuilder: (context, c) => const Icon(
+                                    itemBuilder: (context, c)=> const Icon(
                                       Icons.star,
                                       color: Colors.amber,
                                     ),
-                                    onRatingUpdate: (updateRating) {},
+                                    onRatingUpdate: (updateRating){},
                                     ignoreGestures: true,
                                     unratedColor: Colors.grey,
                                     itemSize: 20,
                                   ),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
+
+                                  const SizedBox(width: 8,),
+
                                   Text(
-                                    "(${eachClothItemData.rating??"rating"})",
+                                    "(" + eachClothItemData.rating.toString() + ")",
                                     style: const TextStyle(
                                       color: Colors.grey,
                                     ),
                                   ),
+
                                 ],
                               ),
+
                             ],
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -313,7 +356,9 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
               },
             ),
           );
-        } else {
+        }
+        else
+        {
           return const Center(
             child: Text("Empty, No Data."),
           );
@@ -322,34 +367,41 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
     );
   }
 
-  allItemWidget(context) {
+  allItemWidget(context)
+  {
     return FutureBuilder(
-        future: getAllClothItems(),
-        builder: (context, AsyncSnapshot<List<Clothes>> dataSnapShot) {
-          if (dataSnapShot.connectionState == ConnectionState.waiting) {
+      future: getAllClothItems(),
+        builder: (context, AsyncSnapshot<List<Clothes>> dataSnapShot)
+        {
+          if(dataSnapShot.connectionState == ConnectionState.waiting)
+          {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (dataSnapShot.data == null) {
+          if(dataSnapShot.data == null)
+          {
             return const Center(
               child: Text(
                 "No Trending item found",
               ),
             );
           }
-          if (dataSnapShot.data!.isNotEmpty) {
+          if(dataSnapShot.data!.length > 0)
+          {
             return ListView.builder(
               itemCount: dataSnapShot.data!.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
+              itemBuilder: (context, index)
+              {
                 Clothes eachClothItemRecord = dataSnapShot.data![index];
 
                 return GestureDetector(
-                  onTap: () {
-                    Get.to(()=> ItemDetailsScreen(itemInfo: eachClothItemRecord));
+                  onTap: ()
+                  {
+                    Get.to(ItemDetailsScreen(itemInfo: eachClothItemRecord));
                   },
                   child: Container(
                     margin: EdgeInsets.fromLTRB(
@@ -361,9 +413,10 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.black,
-                      boxShadow: const [
+                      boxShadow:
+                      const [
                         BoxShadow(
-                          offset: Offset(0, 0),
+                          offset: Offset(0,0),
                           blurRadius: 6,
                           color: Colors.white,
                         ),
@@ -371,6 +424,7 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                     ),
                     child: Row(
                       children: [
+
                         //name + price
                         //tags
                         Expanded(
@@ -379,9 +433,11 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+
                                 //name and price
                                 Row(
                                   children: [
+
                                     //name
                                     Expanded(
                                       child: Text(
@@ -398,10 +454,9 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
 
                                     //price
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 12, right: 12),
+                                      padding: const EdgeInsets.only(left: 12, right: 12),
                                       child: Text(
-                                        "\$ ${eachClothItemRecord.price}",
+                                        "\$ " + eachClothItemRecord.price.toString(),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -411,19 +466,15 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                                         ),
                                       ),
                                     ),
+
                                   ],
                                 ),
 
-                                const SizedBox(
-                                  height: 16,
-                                ),
+                                const SizedBox(height: 16,),
 
                                 //tags
                                 Text(
-                                  "Tags: \n${eachClothItemRecord.tags
-                                          .toString()
-                                          .replaceAll("[", "")
-                                          .replaceAll("]", "")}",
+                                  "Tags: \n" + eachClothItemRecord.tags.toString().replaceAll("[", "").replaceAll("]", ""),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -431,6 +482,7 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                                     color: Colors.grey,
                                   ),
                                 ),
+
                               ],
                             ),
                           ),
@@ -446,13 +498,14 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                             height: 130,
                             width: 130,
                             fit: BoxFit.cover,
-                            placeholder:
-                                const AssetImage("assets/images/images.png"),
-                            image: NetworkImage(
-                              imageUrl+eachClothItemRecord.image!,
+                            placeholder: const AssetImage(
+                              "assets/images/images.png",
                             ),
-                            imageErrorBuilder:
-                                (context, error, stackTraceError) {
+                            image: NetworkImage(
+                              eachClothItemRecord.image!,
+                            ),
+                            imageErrorBuilder: (context, error, stackTraceError)
+                            {
                               return const Center(
                                 child: Icon(
                                   Icons.broken_image_outlined,
@@ -461,17 +514,21 @@ var imageUrl = "http://192.168.95.165/api_clothes_store/";
                             },
                           ),
                         ),
+
                       ],
                     ),
                   ),
                 );
               },
             );
-          } else {
+          }
+          else
+          {
             return const Center(
               child: Text("Empty, No Data."),
             );
           }
-        });
+        }
+    );
   }
 }

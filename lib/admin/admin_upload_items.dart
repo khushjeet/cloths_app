@@ -1,18 +1,28 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:clothes_app/users/authentication/login_screen.dart';
+import 'package:clothes_app/api_connection/api_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
-class AdminUploadItemsScreen extends StatefulWidget {
+
+class AdminUploadItemsScreen extends StatefulWidget
+{
+
+
   @override
   State<AdminUploadItemsScreen> createState() => _AdminUploadItemsScreenState();
 }
 
-class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
+
+
+
+
+class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen>
+{
   final ImagePicker _picker = ImagePicker();
   XFile? pickedImageXFile;
 
@@ -26,77 +36,87 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
   var descriptionController = TextEditingController();
   var imageLink = "";
 
+
   //defaultScreen methods
-  captureImageWithPhoneCamera() async {
+  captureImageWithPhoneCamera() async
+  {
     pickedImageXFile = await _picker.pickImage(source: ImageSource.camera);
 
     Get.back();
 
-    setState(() => pickedImageXFile);
+    setState(()=> pickedImageXFile);
   }
 
-  pickImageFromPhoneGallery() async {
+  pickImageFromPhoneGallery() async
+  {
     pickedImageXFile = await _picker.pickImage(source: ImageSource.gallery);
 
     Get.back();
 
-    setState(() => pickedImageXFile);
+    setState(()=> pickedImageXFile);
   }
 
-  showDialogBoxForImagePickingAndCapturing() {
+  showDialogBoxForImagePickingAndCapturing()
+  {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            backgroundColor: Colors.black,
-            title: const Text(
-              "Item Image",
-              style: TextStyle(
-                color: Colors.deepPurple,
-                fontWeight: FontWeight.bold,
+      context: context,
+      builder: (context)
+      {
+        return SimpleDialog(
+          backgroundColor: Colors.black,
+          title: const Text(
+            "Item Image",
+            style: TextStyle(
+              color: Colors.deepPurple,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          children: [
+            SimpleDialogOption(
+              onPressed: ()
+              {
+                captureImageWithPhoneCamera();
+              },
+              child: const Text(
+                "Capture with Phone Camera",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
               ),
             ),
-            children: [
-              SimpleDialogOption(
-                onPressed: () {
-                  captureImageWithPhoneCamera();
-                },
-                child: const Text(
-                  "Capture with Phone Camera",
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
+            SimpleDialogOption(
+              onPressed: ()
+              {
+                pickImageFromPhoneGallery();
+              },
+              child: const Text(
+                "Pick Image From Phone Gallery",
+                style: TextStyle(
+                  color: Colors.grey,
                 ),
               ),
-              SimpleDialogOption(
-                onPressed: () {
-                  pickImageFromPhoneGallery();
-                },
-                child: const Text(
-                  "Pick Image From Phone Gallery",
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
+            ),
+            SimpleDialogOption(
+              onPressed: ()
+              {
+                Get.back();
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.red,
                 ),
               ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      }
+    );
   }
   //defaultScreen methods ends here
 
-  Widget defaultScreen() {
+  Widget defaultScreen()
+  {
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -110,7 +130,9 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
           ),
         ),
         automaticallyImplyLeading: false,
-        title: const Text("Welcome Admin"),
+        title: const Text(
+            "Welcome Admin"
+        ),
         centerTitle: true,
       ),
       body: Container(
@@ -126,11 +148,6 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => const LoginScreen());
-                  },
-                  child: const Text("Go To Login")),
               const Icon(
                 Icons.add_photo_alternate,
                 color: Colors.white54,
@@ -142,7 +159,8 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                 color: Colors.black38,
                 borderRadius: BorderRadius.circular(30),
                 child: InkWell(
-                  onTap: () {
+                  onTap: ()
+                  {
                     showDialogBoxForImagePickingAndCapturing();
                   },
                   borderRadius: BorderRadius.circular(30),
@@ -168,66 +186,102 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
     );
   }
 
-  uploadItemImage() async {
+
+  //uploadItemFormScreen methods
+  uploadItemImage() async
+  {
+    var requestImgurApi = http.MultipartRequest(
+      "POST",
+      Uri.parse("https://api.imgur.com/3/image")
+    );
+
+    String imageName = DateTime.now().millisecondsSinceEpoch.toString();
+    requestImgurApi.fields['title'] = imageName;
+    requestImgurApi.headers['Authorization'] = "Client-ID " + "6ca0d6456311e4d";
+
+    var imageFile = await http.MultipartFile.fromPath(
+      'image',
+      pickedImageXFile!.path,
+      filename: imageName,
+    );
+
+    requestImgurApi.files.add(imageFile);
+    var responseFromImgurApi = await requestImgurApi.send();
+
+    var responseDataFromImgurApi = await responseFromImgurApi.stream.toBytes();
+    var resultFromImgurApi = String.fromCharCodes(responseDataFromImgurApi);
+
+    Map<String, dynamic> jsonRes = json.decode(resultFromImgurApi);
+    imageLink = (jsonRes["data"]["link"]).toString();
+    String deleteHash = (jsonRes["data"]["deletehash"]).toString();
+
+    saveItemInfoToDatabase();
+  }
+
+  saveItemInfoToDatabase() async
+  {
     List<String> tagsList = tagsController.text.split(',');
     List<String> sizesList = sizesController.text.split(',');
     List<String> colorsList = colorsController.text.split(',');
 
-    try {
-      var requestImgurApi = http.MultipartRequest(
-          "POST",
-          Uri.parse(
-              "http://192.168.95.165/api_clothes_store/items/upload.php"));
-
-      String imageName = DateTime.now().millisecondsSinceEpoch.toString();
-
-      var imageFile = await http.MultipartFile.fromPath(
-        'file',
-        pickedImageXFile!.path,
-        filename: imageName,
-      );
-      requestImgurApi.files.add(imageFile);
-
-      requestImgurApi.fields.addAll(
+    try
+    {
+      var response = await http.post(
+        Uri.parse(API.uploadNewItem),
+        body:
         {
-          // 'name': nameController.text.trim().toString(),
-          // 'rating': ratingController.text.trim().toString(),
-          // 'tags': tagsList.join(','), // Join list items without brackets
-          // 'price': priceController.text.trim().toString(),
-          // 'sizes': sizesList.join(','), // Join list items without brackets
-          // 'colors': colorsList.join(','), // Join list items without brackets
-          // 'description': descriptionController.text.trim().toString(),
-          // 'image': imageLink.toString(),
+          'item_id': '1',
           'name': nameController.text.trim().toString(),
           'rating': ratingController.text.trim().toString(),
-          'tags': tagsList.toString(), // Join list items without brackets
+          'tags': tagsList.toString(),
           'price': priceController.text.trim().toString(),
-          'sizes': sizesList.toString(), // Join list items without brackets
-          'colors': colorsList.toString(), // Join list items without brackets
+          'sizes': sizesList.toString(),
+          'colors': colorsList.toString(),
           'description': descriptionController.text.trim().toString(),
           'image': imageLink.toString(),
         },
       );
-      await requestImgurApi.send();
 
-      setState(() {
-        pickedImageXFile = null;
-        nameController.clear();
-        ratingController.clear();
-        tagsController.clear();
-        priceController.clear();
-        sizesController.clear();
-        colorsController.clear();
-        descriptionController.clear();
-      });
+      if(response.statusCode == 200)
+      {
+        var resBodyOfUploadItem = jsonDecode(response.body);
 
-      Get.to(AdminUploadItemsScreen());
-    } catch (e) {
-      Fluttertoast.showToast(msg: "$e");
+        if(resBodyOfUploadItem['success'] == true)
+        {
+          Fluttertoast.showToast(msg: "New item uploaded successfully");
+
+          setState(() {
+            pickedImageXFile=null;
+            nameController.clear();
+            ratingController.clear();
+            tagsController.clear();
+            priceController.clear();
+            sizesController.clear();
+            colorsController.clear();
+            descriptionController.clear();
+          });
+
+          Get.to(AdminUploadItemsScreen());
+        }
+        else
+        {
+          Fluttertoast.showToast(msg: "Item not uploaded. Error, Try Again.");
+        }
+      }
+      else
+      {
+        Fluttertoast.showToast(msg: "Status is not 200");
+      }
+    }
+    catch(errorMsg)
+    {
+      print("Error:: " + errorMsg.toString());
     }
   }
+  //uploadItemFormScreen methods ends here
 
-  Widget uploadItemFormScreen() {
+  Widget uploadItemFormScreen()
+  {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -242,12 +296,15 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
           ),
         ),
         automaticallyImplyLeading: false,
-        title: const Text("Upload Form"),
+        title: const Text(
+          "Upload Form"
+        ),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {
+          onPressed: ()
+          {
             setState(() {
-              pickedImageXFile = null;
+              pickedImageXFile=null;
               nameController.clear();
               ratingController.clear();
               tagsController.clear();
@@ -265,7 +322,8 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: ()
+            {
               Fluttertoast.showToast(msg: "Uploading now...");
 
               uploadItemImage();
@@ -281,6 +339,7 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
       ),
       body: ListView(
         children: [
+
           //image
           Container(
             height: MediaQuery.of(context).size.height * 0.4,
@@ -316,16 +375,17 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                 padding: const EdgeInsets.fromLTRB(30, 30, 30, 8),
                 child: Column(
                   children: [
+
                     //email-password-login button
                     Form(
                       key: formKey,
                       child: Column(
                         children: [
+
                           //item name
                           TextFormField(
                             controller: nameController,
-                            validator: (val) =>
-                                val == "" ? "Please write item name" : null,
+                            validator: (val) => val == "" ? "Please write item name" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.title,
@@ -365,15 +425,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item ratings
                           TextFormField(
                             controller: ratingController,
-                            validator: (val) =>
-                                val == "" ? "Please give item rating" : null,
+                            validator: (val) => val == "" ? "Please give item rating" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.rate_review,
@@ -413,15 +470,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item tags
                           TextFormField(
                             controller: tagsController,
-                            validator: (val) =>
-                                val == "" ? "Please write item tags" : null,
+                            validator: (val) => val == "" ? "Please write item tags" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.tag,
@@ -461,15 +515,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item price
                           TextFormField(
                             controller: priceController,
-                            validator: (val) =>
-                                val == "" ? "Please write item price" : null,
+                            validator: (val) => val == "" ? "Please write item price" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.price_change_outlined,
@@ -509,15 +560,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item sizes
                           TextFormField(
                             controller: sizesController,
-                            validator: (val) =>
-                                val == "" ? "Please write item sizes" : null,
+                            validator: (val) => val == "" ? "Please write item sizes" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.picture_in_picture,
@@ -557,15 +605,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item colors
                           TextFormField(
                             controller: colorsController,
-                            validator: (val) =>
-                                val == "" ? "Please write item colors" : null,
+                            validator: (val) => val == "" ? "Please write item colors" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.color_lens,
@@ -605,16 +650,12 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //item description
                           TextFormField(
                             controller: descriptionController,
-                            validator: (val) => val == ""
-                                ? "Please write item description"
-                                : null,
+                            validator: (val) => val == "" ? "Please write item description" : null,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.description,
@@ -654,19 +695,18 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 18,
-                          ),
+                          const SizedBox(height: 18,),
 
                           //button
                           Material(
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(30),
                             child: InkWell(
-                              onTap: () {
-                                if (formKey.currentState!.validate()) {
-                                  Fluttertoast.showToast(
-                                      msg: "Uploading now...");
+                              onTap: ()
+                              {
+                                if(formKey.currentState!.validate())
+                                {
+                                  Fluttertoast.showToast(msg: "Uploading now...");
 
                                   uploadItemImage();
                                 }
@@ -691,21 +731,24 @@ class _AdminUploadItemsScreenState extends State<AdminUploadItemsScreen> {
                       ),
                     ),
 
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16,),
                   ],
                 ),
               ),
             ),
           ),
+
         ],
       ),
     );
   }
 
+
+
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
     return pickedImageXFile == null ? defaultScreen() : uploadItemFormScreen();
   }
 }

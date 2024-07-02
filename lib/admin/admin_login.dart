@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:clothes_app/admin/admin_upload_items.dart';
 import 'package:clothes_app/api_connection/api_connection.dart';
 import 'package:clothes_app/users/authentication/login_screen.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -12,8 +11,6 @@ import 'package:http/http.dart' as http;
 
 class AdminLoginScreen extends StatefulWidget
 {
-  const AdminLoginScreen({super.key});
-
 
 
   @override
@@ -59,6 +56,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen>
           Fluttertoast.showToast(msg: "Incorrect Credentials.\nPlease write correct password or email and Try Again.");
         }
       }
+      else
+      {
+        Fluttertoast.showToast(msg: "Status is not 200");
+      }
     }
     catch(errorMsg)
     {
@@ -86,7 +87,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen>
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 285,
-                
+                    child: Image.asset(
+                      "images/admin.jpg",
+                    ),
                   ),
 
                   //login screen sign-in form
@@ -266,7 +269,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen>
                                 TextButton(
                                   onPressed: ()
                                   {
-                                    Get.to(const LoginScreen());
+                                    Get.to(LoginScreen());
                                   },
                                   child: const Text(
                                     "Click Here",

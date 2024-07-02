@@ -1,8 +1,8 @@
-import 'package:clothes_app/admin/admin_upload_items.dart';
+import 'package:clothes_app/users/authentication/login_screen.dart';
 import 'package:clothes_app/users/fragments/dashboard_of_fragments.dart';
 import 'package:clothes_app/users/userPreferences/user_preferences.dart';
 import 'package:flutter/material.dart';
- import 'package:get/get.dart';
+import 'package:get/get.dart';
 
 void main()
 {
@@ -12,7 +12,7 @@ void main()
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Clothes App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      theme: ThemeData( 
         primarySwatch: Colors.purple,
       ),
       home: FutureBuilder(
@@ -29,8 +29,7 @@ class MyApp extends StatelessWidget {
         {
           if(dataSnapShot.data == null)
           {
-          //  return const LoginScreen();
-          return AdminUploadItemsScreen();
+            return LoginScreen();
           }
           else
           {
