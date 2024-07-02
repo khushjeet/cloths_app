@@ -1,123 +1,105 @@
-import 'dart:convert';
+import 'dart:convert'; // For JSON encoding and decoding
 
-import 'package:clothes_app/api_connection/api_connection.dart';
-import 'package:clothes_app/users/authentication/login_screen.dart';
-import 'package:clothes_app/users/model/user.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:clothes_app/api_connection/api_connection.dart'; // API connection for the app
+import 'package:clothes_app/users/authentication/login_screen.dart'; // Login screen navigation
+import 'package:clothes_app/users/model/user.dart'; // User model class
+import 'package:flutter/material.dart'; // Flutter framework for building UI
+import 'package:fluttertoast/fluttertoast.dart'; // For showing toast messages
+import 'package:get/get.dart'; // State management and navigation package
+import 'package:http/http.dart' as http; // HTTP package for making API requests
 
-
-class SignUpScreen extends StatefulWidget
-{
-
-
+// SignUpScreen widget class
+class SignUpScreen extends StatefulWidget {
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
+// State class for SignUpScreen
+class _SignUpScreenState extends State<SignUpScreen> {
+  var formKey = GlobalKey<FormState>(); // Form key for form validation
+  var nameController = TextEditingController(); // Controller for name input
+  var emailController = TextEditingController(); // Controller for email input
+  var passwordController =
+      TextEditingController(); // Controller for password input
+  var isObsecure = true.obs; // Observable for toggling password visibility
 
-
-class _SignUpScreenState extends State<SignUpScreen>
-{
-  var formKey = GlobalKey<FormState>();
-  var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var passwordController = TextEditingController();
-  var isObsecure = true.obs;
-
-  validateUserEmail() async
-  {
-    try
-    {
+  // Function to validate user email
+  validateUserEmail() async {
+    try {
       var res = await http.post(
-        Uri.parse(API.validateEmail),
+        Uri.parse(API.validateEmail), // API endpoint to validate email
         body: {
-          'user_email': emailController.text.trim(),
+          'user_email': emailController.text.trim(), // Email input from user
         },
       );
 
-      if(res.statusCode == 200) //from flutter app the connection with api to server - success
-      {
+      // If the connection to the API is successful
+      if (res.statusCode == 200) {
         var resBodyOfValidateEmail = jsonDecode(res.body);
 
-        if(resBodyOfValidateEmail['emailFound'] == true)
-        {
-          Fluttertoast.showToast(msg: "Email is already in someone else use. Try another email.");
-        }
-        else
-        {
-          //register & save new user record to database
+        // If the email is already in use
+        if (resBodyOfValidateEmail['emailFound'] == true) {
+          Fluttertoast.showToast(
+              msg: "Email is already in someone else use. Try another email.");
+        } else {
+          // Register and save new user record to database
           registerAndSaveUserRecord();
         }
-      }
-      else
-      {
+      } else {
         Fluttertoast.showToast(msg: "Status is not 200");
       }
-    }
-    catch(e)
-    {
+    } catch (e) {
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
     }
   }
 
-  registerAndSaveUserRecord() async
-  {
+  // Function to register and save user record
+  registerAndSaveUserRecord() async {
     User userModel = User(
       1,
-      nameController.text.trim(),
-      emailController.text.trim(),
-      passwordController.text.trim(),
+      nameController.text.trim(), // Name input from user
+      emailController.text.trim(), // Email input from user
+      passwordController.text.trim(), // Password input from user
     );
 
-    try
-    {
+    try {
       var res = await http.post(
-        Uri.parse(API.signUp),
-        body: userModel.toJson(),
+        Uri.parse(API.signUp), // API endpoint for sign up
+        body: userModel.toJson(), // User model converted to JSON
       );
 
-      if(res.statusCode == 200) //from flutter app the connection with api to server - success
-      {
+      // If the connection to the API is successful
+      if (res.statusCode == 200) {
         var resBodyOfSignUp = jsonDecode(res.body);
-        if(resBodyOfSignUp['success'] == true)
-        {
-          Fluttertoast.showToast(msg: "Congratulations, you are SignUp Successfully.");
+        if (resBodyOfSignUp['success'] == true) {
+          Fluttertoast.showToast(
+              msg: "Congratulations, you are SignUp Successfully.");
 
+          // Clear input fields after successful sign up
           setState(() {
             nameController.clear();
             emailController.clear();
             passwordController.clear();
           });
-        }
-        else
-        {
+        } else {
           Fluttertoast.showToast(msg: "Error Occurred, Try Again.");
         }
-      }
-      else
-      {
+      } else {
         Fluttertoast.showToast(msg: "Status is not 200");
       }
-    }
-    catch(e)
-    {
+    } catch (e) {
       print(e.toString());
       Fluttertoast.showToast(msg: e.toString());
     }
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black, // Background color of the screen
       body: LayoutBuilder(
-        builder: (context, cons)
-        {
+        builder: (context, cons) {
           return ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: cons.maxHeight,
@@ -125,17 +107,16 @@ class _SignUpScreenState extends State<SignUpScreen>
             child: SingleChildScrollView(
               child: Column(
                 children: [
-
-                  //signup screen header
+                  // Signup screen header
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 285,
                     child: Image.asset(
-                      "assets/images/images.png",
+                      "assets/images/images.png", // Header image
                     ),
                   ),
 
-                  //signup screen sign-up form
+                  // Signup screen form
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Container(
@@ -156,17 +137,16 @@ class _SignUpScreenState extends State<SignUpScreen>
                         padding: const EdgeInsets.fromLTRB(30, 30, 30, 8),
                         child: Column(
                           children: [
-
-                            //name-email-password || signUp button
+                            // Form fields: name, email, password and sign up button
                             Form(
                               key: formKey,
                               child: Column(
                                 children: [
-
-                                  //name
+                                  // Name input field
                                   TextFormField(
                                     controller: nameController,
-                                    validator: (val) => val == "" ? "Please write name" : null,
+                                    validator: (val) =>
+                                        val == "" ? "Please write name" : null,
                                     decoration: InputDecoration(
                                       prefixIcon: const Icon(
                                         Icons.person,
@@ -197,7 +177,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                                           color: Colors.white60,
                                         ),
                                       ),
-                                      contentPadding: const EdgeInsets.symmetric(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
@@ -206,12 +187,15 @@ class _SignUpScreenState extends State<SignUpScreen>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 18,),
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
 
-                                  //email
+                                  // Email input field
                                   TextFormField(
                                     controller: emailController,
-                                    validator: (val) => val == "" ? "Please write email" : null,
+                                    validator: (val) =>
+                                        val == "" ? "Please write email" : null,
                                     decoration: InputDecoration(
                                       prefixIcon: const Icon(
                                         Icons.email,
@@ -242,7 +226,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                                           color: Colors.white60,
                                         ),
                                       ),
-                                      contentPadding: const EdgeInsets.symmetric(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
                                         horizontal: 14,
                                         vertical: 6,
                                       ),
@@ -251,57 +236,68 @@ class _SignUpScreenState extends State<SignUpScreen>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 18,),
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
 
-                                  //password
+                                  // Password input field
                                   Obx(
-                                        ()=> TextFormField(
+                                    () => TextFormField(
                                       controller: passwordController,
                                       obscureText: isObsecure.value,
-                                      validator: (val) => val == "" ? "Please write password" : null,
+                                      validator: (val) => val == ""
+                                          ? "Please write password"
+                                          : null,
                                       decoration: InputDecoration(
                                         prefixIcon: const Icon(
                                           Icons.vpn_key_sharp,
                                           color: Colors.black,
                                         ),
                                         suffixIcon: Obx(
-                                              ()=> GestureDetector(
-                                            onTap: ()
-                                            {
-                                              isObsecure.value = !isObsecure.value;
+                                          () => GestureDetector(
+                                            onTap: () {
+                                              isObsecure.value = !isObsecure
+                                                  .value; // Toggle password visibility
                                             },
                                             child: Icon(
-                                              isObsecure.value ? Icons.visibility_off : Icons.visibility,
+                                              isObsecure.value
+                                                  ? Icons.visibility_off
+                                                  : Icons.visibility,
                                               color: Colors.black,
                                             ),
                                           ),
                                         ),
                                         hintText: "password...",
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           borderSide: const BorderSide(
                                             color: Colors.white60,
                                           ),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           borderSide: const BorderSide(
                                             color: Colors.white60,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           borderSide: const BorderSide(
                                             color: Colors.white60,
                                           ),
                                         ),
                                         disabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                           borderSide: const BorderSide(
                                             color: Colors.white60,
                                           ),
                                         ),
-                                        contentPadding: const EdgeInsets.symmetric(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
                                           horizontal: 14,
                                           vertical: 6,
                                         ),
@@ -311,19 +307,18 @@ class _SignUpScreenState extends State<SignUpScreen>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 18,),
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
 
-                                  //button
+                                  // Sign up button
                                   Material(
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(30),
                                     child: InkWell(
-                                      onTap: ()
-                                      {
-                                        if(formKey.currentState!.validate())
-                                        {
-                                          //validate the email
-                                          validateUserEmail();
+                                      onTap: () {
+                                        if (formKey.currentState!.validate()) {
+                                          validateUserEmail(); // Validate the email if form is valid
                                         }
                                       },
                                       borderRadius: BorderRadius.circular(30),
@@ -346,19 +341,19 @@ class _SignUpScreenState extends State<SignUpScreen>
                               ),
                             ),
 
-                            const SizedBox(height: 16,),
+                            const SizedBox(
+                              height: 16,
+                            ),
 
-                            //already have account button - button
+                            // Already have account? Login button
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
-                                    "Already have an Account?"
-                                ),
+                                const Text("Already have an Account?"),
                                 TextButton(
-                                  onPressed: ()
-                                  {
-                                    Get.to(LoginScreen());
+                                  onPressed: () {
+                                    Get.to(
+                                        LoginScreen()); // Navigate to login screen
                                   },
                                   child: const Text(
                                     "Login Here",
@@ -375,7 +370,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
